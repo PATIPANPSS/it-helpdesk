@@ -6,5 +6,6 @@ const authMiddleware = require('../middlewares/authMiddleware');
 router.post('/', authMiddleware.verifyToken, ticketController.createTicket);
 router.get('/', authMiddleware.verifyToken, ticketController.getAllTicket);
 router.get('/:id', authMiddleware.verifyToken, ticketController.getTicketById);
+router.put('/:id/status', authMiddleware.verifyToken, ticketController.updateTicketStatus)
 
 module.exports = router;
