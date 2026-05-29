@@ -109,3 +109,26 @@ exports.updateTicketStatus = async (req, res) => {
     res.status(500).json({ error: "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์" });
   }
 };
+
+exports.assignTicket = async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+
+    const userId = req.user.id;
+
+    const sql = "UPDATE tickets SET assignee_id = ?, status = 'in_progress' WHERE id = ?";
+
+    const [result] = await db.query(sql, [userId, ticketId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "ไม่พบใบแจ้งซ่อมที่ระบุ" });
+    }
+
+    res.status(200).json({
+      message: "รับงานเรียบร้อยแล้ว",
+    });
+  } catch (error) {
+    console.error("ระบบรับงานขัดข้อง:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์" });
+  }
+};
