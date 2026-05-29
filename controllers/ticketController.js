@@ -116,7 +116,8 @@ exports.assignTicket = async (req, res) => {
 
     const userId = req.user.id;
 
-    const sql = "UPDATE tickets SET assignee_id = ?, status = 'in_progress' WHERE id = ?";
+    const sql =
+      "UPDATE tickets SET assignee_id = ?, status = 'in_progress' WHERE id = ?";
 
     const [result] = await db.query(sql, [userId, ticketId]);
 
@@ -129,6 +130,32 @@ exports.assignTicket = async (req, res) => {
     });
   } catch (error) {
     console.error("ระบบรับงานขัดข้อง:", error);
+    res.status(500).json({ error: "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์" });
+  }
+};
+
+exports.addComment = async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+
+    const userId = req.user.id;
+
+    const {message} = req.body;
+
+    if (!message) {
+      return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
+    }
+
+    const sql =
+      "INSERT INTO ticket_logs (ticket_id, user_id, action, message) VALUES (?, ?,'commented', ?)";
+
+    const [result] = await db.query(sql, [ticketId, userId, message]);
+
+    res.status(201).json({
+      message: "เพิ่มคอมเมนต์สำเร็จ",
+    });
+  } catch (error) {
+    console.error("ระบบคอมเมนต์ขัดข้อง:", error);
     res.status(500).json({ error: "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์" });
   }
 };
